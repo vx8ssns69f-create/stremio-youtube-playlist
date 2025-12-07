@@ -1,0 +1,10 @@
+{
+  "name": "stremio-youtube-playlist-addon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "stremio-addon-sdk": "^1.5.0",
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "community.youtube.playlists",
+  "version": "1.0.0",
+  "name": "YouTube Playlists Search",
+  "description": "Search YouTube playlists inside Stremio and watch them as series.",
+  "catalogs": [
+    {
+      "type": "series",
+      "id": "ytsearch",
+      "name": "YouTube Playlists Search"
+    }
+  ],
+  "types": ["series"],
+  "resources": ["catalog", "stream"],
+  "idPrefixes": ["ytp_"]
+}
