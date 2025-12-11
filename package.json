@@ -1,17 +1,11 @@
 {
-  "id": "community.youtube.playlists",
-  "version": "1.0.1",
-  "name": "YouTube Playlists Search",
-  "description": "Search YouTube playlists inside Stremio and watch them as series.",
-  "catalogs": [
-    {
-      "type": "series",
-      "id": "ytsearch",
-      "name": "YouTube Playlists Search",
-      "extra": [{ "name": "search" }]
-    }
-  ],
-  "types": ["series"],
-  "resources": ["catalog", "stream"],
-  "idPrefixes": ["ytp_"]
+  "name": "stremio-youtube-addon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "@stremio/addon-sdk": "^1.3.3"
+  }
 }
