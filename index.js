@@ -3,55 +3,63 @@ import fetch from "node-fetch";
 
 const app = express();
 
-// YouTube search API endpoint (NO API KEY needed)
+// YouTube scraper (no API key needed)
 async function searchYouTubePlaylists(query) {
-  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=EgIQAw%253D%253D`; 
-  const html = await fetch(url).then(r => r.text());
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=EgIQAw%253D%253D`;
+    const html = await fetch(url).then(r => r.text());
 
-  const playlistRegex = /"playlistId":"(.*?)".*?"title":{"simpleText":"(.*?)"}/g;
-  let result = [];
-  let match;
+    const playlistRegex = /"playlistId":"(.*?)".*?"title":{"simpleText":"(.*?)"}/g;
+    let result = [];
+    let match;
 
-  while ((match = playlistRegex.exec(html)) !== null) {
-    result.push({
-      id: "ytpl_" + match[1],
-      name: match[2],
-      type: "series",
-      poster: "https://i.ytimg.com/vi/" + match[1] + "/hqdefault.jpg"
-    });
-  }
+    while ((match = playlistRegex.exec(html)) !== null) {
+        result.push({
+            id: "ytpl_" + match[1],
+            name: match[2],
+            type: "series",
+            poster: "https://i.ytimg.com/vi/" + match[1] + "/hqdefault.jpg"
+        });
+    }
 
-  return result.slice(0, 20); // limit results
+    return result.slice(0, 20);
 }
 
-// API ROUTE
-app.get("/api/index.js", async (req, res) => {
-  const { search } = req.query;
+// ---- STREMIO CATALOG ENDPOINT ----
+// Stremio always calls this format:
+// /catalog/series/youtube/search=<query>
+app.get("/catalog/:type/:id/search=:query", async (req, res) => {
+    const { query } = req.params;
 
-  if (!search) {
-    return res.json({ results: [] });
-  }
+    const results = await searchYouTubePlaylists(query);
 
-  const playlists = await searchYouTubePlaylists(search);
-
-  res.json({
-    id: "youtube-playlist-search",
-    type: "series",
-    results: playlists
-  });
+    res.json({
+        metas: results
+    });
 });
 
-// Required for manifest.json
+// Fallback (optional)
+app.get("/", (req, res) => {
+    res.send("YouTube Playlist Addon Running");
+});
+
+// Manifest for Stremio
 app.get("/manifest.json", (req, res) => {
-  res.json({
-    id: "youtube-playlist-search",
-    version: "1.0.0",
-    name: "YouTube Playlist Search",
-    description: "Search YouTube playlists and watch in Stremio",
-    types: ["series"],
-    resources: ["catalog", "stream"],
-    idPrefixes: ["ytpl_"]
-  });
+    res.json({
+        id: "youtube-playlist-search",
+        version: "1.0.0",
+        name: "YouTube Playlist Search",
+        description: "Search and watch YouTube playlists in Stremio",
+        catalogs: [
+            {
+                type: "series",
+                id: "youtube",
+                name: "YouTube Playlists"
+            }
+        ],
+        resources: ["catalog"],
+        types: ["series"],
+        idPrefixes: ["ytpl_"]
+    });
 });
 
 export default app;
